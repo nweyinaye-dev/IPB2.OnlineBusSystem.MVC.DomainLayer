@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="IPB2.OnlineBusSystem.Database/IPB2.OnlineBusSystem.Database.csproj" />
+  <Project Path="IPB2.OnlineBusSystem.Domain/IPB2.OnlineBusSystem.Domain.csproj" />
+  <Project Path="IPB2.OnlineBusSystem.MVC.DomainLayer/IPB2.OnlineBusSystem.MVC.csproj" />
+</Solution>
