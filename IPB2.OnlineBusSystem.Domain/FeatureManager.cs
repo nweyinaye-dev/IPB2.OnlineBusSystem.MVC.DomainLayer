@@ -4,6 +4,8 @@ using IPB2.OnlineBusSystem.Domain.Features.Bus;
 using IPB2.OnlineBusSystem.Domain.Features.Route;
 using IPB2.OnlineBusSystem.Domain.Features.Schedule;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -30,7 +32,8 @@ namespace IPB2.OnlineBusSystem.Domain
         public static WebApplicationBuilder AddDatabase(this WebApplicationBuilder builder)
         {
             // DbContext
-            builder.Services.AddDbContext<AppDbContext>();
+            builder.Services.AddDbContext<AppDbContext>(options =>
+           options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             return builder;
         }

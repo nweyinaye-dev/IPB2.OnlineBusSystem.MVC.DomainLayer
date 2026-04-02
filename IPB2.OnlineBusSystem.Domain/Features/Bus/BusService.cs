@@ -25,8 +25,8 @@ namespace IPB2.OnlineBusSystem.Domain.Features.Bus
             var totalCount = await query.CountAsync();
 
             var data = await query
-                .Skip((pageNo - 1) * pageSize)
-                .Take(pageSize)
+                //.Skip((pageNo - 1) * pageSize)
+                //.Take(pageSize)
                 .Select(x => new BusResponse
                 {
                     Id = x.Id,
