@@ -1,7 +1,11 @@
-﻿using IPB2.OnlineBusSystem.Domain.Common;
+﻿using Azure;
+using IPB2.OnlineBusSystem.Domain.Common;
 using IPB2.OnlineBusSystem.Domain.Features.Bus;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System.Text;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace IPB2.OnlineBusSystem.MVC.HttpClientWebApi.Controllers
 {
@@ -21,18 +25,9 @@ namespace IPB2.OnlineBusSystem.MVC.HttpClientWebApi.Controllers
             if (httpResponse.IsSuccessStatusCode)
             {
                 var json = await httpResponse.Content.ReadAsStringAsync();
-                response = JsonConvert.DeserializeObject<GetBusResponse>(json);
+                response = JsonConvert.DeserializeObject<GetBusResponse>(json)!;
 
             }
-            else
-            {
-
-            }
-            //var response = await _busService.GetBusAsync(pageNumber, 10);
-            //if (!string.IsNullOrEmpty(searchTerm))
-            //{
-            //    response = await _busService.GetBusesBySearchAsync(searchTerm);
-            //}
             return View(response);
         }
 
@@ -45,39 +40,64 @@ namespace IPB2.OnlineBusSystem.MVC.HttpClientWebApi.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(CreateBusRequest request)
         {
-            //if (ModelState.IsValid)
-            //{
-            //    var upsertRequest = new UpsertBusRequest
-            //    {
-            //        BusNo = request.BusNo,
-            //        BusName = request.BusName,
-            //        BusType = request.BusType,
-            //        TotalSeat = request.TotalSeat
-            //    };
-            //    var result = await _busService.CreateAsync(upsertRequest);
-            //    if (result.Status ==ResponseType.Success)
-            //    {
-            //        return RedirectToAction(nameof(Index));
-            //    }
-            //    ModelState.AddModelError("", result.Message ?? "Failed to create bus.");
-            //}
+            if (ModelState.IsValid)
+            {
+                var upsertRequest = new UpsertBusRequest
+                {
+                    BusNo = request.BusNo,
+                    BusName = request.BusName,
+                    BusType = request.BusType,
+                    TotalSeat = request.TotalSeat
+                };
+
+                var requestJson = JsonConvert.SerializeObject(upsertRequest);
+                HttpContent content = new StringContent(requestJson,Encoding.UTF8,Application.Json);
+
+                HttpResponseMessage httpResponse = await _httpClient.PostAsync("api/bus",content);
+
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    var json = await httpResponse.Content.ReadAsStringAsync();
+                    ResponseBaseModel response = JsonConvert.DeserializeObject<ResponseBaseModel>(json)!;
+                    if (response.IsSuccess)
+                    {
+                        return RedirectToAction(nameof(Index));
+                    }
+
+                    ModelState.AddModelError("", response.Message ?? "Failed to create bus.");
+                }
+               
+            }
             return RedirectToAction(nameof(Index));
         }
 
         [HttpPost]
         public async Task<IActionResult> Edit(UpsertBusRequest request, string id)
         {
-            //if (ModelState.IsValid)
-            //{
-            //    var result = await _busService.UpsertAsync(request, id);
-            //    if (result.Status ==ResponseType.Success)
-            //    {
-            //        return RedirectToAction(nameof(Index));
-            //    }
-            //    ModelState.AddModelError("", result.Message ?? "Failed to update bus.");
-            //}
+            if (ModelState.IsValid)
+            {
+                var requestJson = JsonConvert.SerializeObject(request);
+                HttpContent content = new StringContent(requestJson, Encoding.UTF8, Application.Json);
+
+                HttpResponseMessage httpResponse = await _httpClient.PutAsync($"api/bus/{id}", content);
+
+                if (httpResponse.IsSuccessStatusCode)
+                {
+                    var json = await httpResponse.Content.ReadAsStringAsync();
+                    ResponseBaseModel response = JsonConvert.DeserializeObject<ResponseBaseModel>(json)!;
+                    if (response.IsSuccess)
+                    {
+                        return RedirectToAction(nameof(Index));
+                    }
+
+                    ModelState.AddModelError("", response.Message ?? "Failed to update bus.");
+                }
+               
+            }
             return RedirectToAction(nameof(Index));
         }
+            
+        
         [HttpPost]
         public async Task<IActionResult> Delete(string id)
         {
@@ -87,6 +107,8 @@ namespace IPB2.OnlineBusSystem.MVC.HttpClientWebApi.Controllers
             //    return RedirectToAction(nameof(Index));
             //}
             //ModelState.AddModelError("", result.Message ?? "Failed to delete bus.");
+
+
             return RedirectToAction(nameof(Index));
         }
     }
