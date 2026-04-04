@@ -4,6 +4,7 @@ using IPB2.OnlineBusSystem.Domain.Features.Bus;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System.Reflection.Metadata;
 using System.Text;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -101,12 +102,19 @@ namespace IPB2.OnlineBusSystem.MVC.HttpClientWebApi.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(string id)
         {
-            //var result = await _busService.DeleteAsync(id);
-            //if (result.Status == ResponseType.Success)
-            //{
-            //    return RedirectToAction(nameof(Index));
-            //}
-            //ModelState.AddModelError("", result.Message ?? "Failed to delete bus.");
+            HttpResponseMessage httpResponse = await _httpClient.PutAsync($"api/bus/delete/{id}", null);
+
+            if (httpResponse.IsSuccessStatusCode)
+            {
+                var json = await httpResponse.Content.ReadAsStringAsync();
+                ResponseBaseModel response = JsonConvert.DeserializeObject<ResponseBaseModel>(json)!;
+                if (response.IsSuccess)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+
+                ModelState.AddModelError("", response.Message ?? "Failed to delete bus.");
+            }
 
 
             return RedirectToAction(nameof(Index));

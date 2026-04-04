@@ -1,4 +1,4 @@
-﻿using IPB2.OnlineBusSystem.Domain.Common;
+using IPB2.OnlineBusSystem.Domain.Common;
 using IPB2.OnlineBusSystem.Domain.Features.Booking;
 using Microsoft.AspNetCore.Mvc;
 
@@ -47,5 +47,17 @@ namespace IPB2.OnlineBusSystem.WebApi.Features.User
             return ResponseHelper.ConvertResponseType(response);
         }
 
+        [HttpPost("/cancel")]
+        public async Task<IActionResult> Cancel(string id)
+        {
+            var result = await _bookService.CancelAsync(id);
+            if (result.Status == ResponseType.Success)
+            {
+                return Ok(new ResponseBaseModel{ IsSuccess = true, Message = result.Message });
+            }
+            return Ok(new ResponseBaseModel { IsSuccess = false, Message = result.Message });
+        }
+
+       
     }
 }

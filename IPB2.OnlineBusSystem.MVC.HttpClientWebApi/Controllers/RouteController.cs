@@ -1,31 +1,39 @@
-﻿using IPB2.OnlineBusSystem.Domain.Common;
+using IPB2.OnlineBusSystem.Domain.Common;
 using IPB2.OnlineBusSystem.Domain.Features.Route;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
+using System.Text;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace IPB2.OnlineBusSystem.MVC.HttpClientWebApi.Controllers
 {
     public class RouteController : Controller
     {
-        private readonly IRouteService _routeService;
+        private readonly HttpClient _httpClient;
 
-        public RouteController(IRouteService routeService)
+        public RouteController(IHttpClientFactory httpClientFactory)
         {
-            _routeService = routeService;
+            _httpClient = httpClientFactory.CreateClient("BackendApi");
         }
+
         public async Task<IActionResult> Index(string? searchTerm, int pageNumber = 1)
         {
-            var response = await _routeService.GetRoutesAsync(pageNumber, 10);
-            //if (!string.IsNullOrEmpty(searchTerm))
-            //{
-            //    response = await _routeService.GetBusesBySearchAsync(searchTerm);
-            //}
+            GetRoutesResponse response = new GetRoutesResponse();
+            HttpResponseMessage httpResponse = await _httpClient.GetAsync("api/routes?pageNo=1&pageSize=10");
+            if (httpResponse.IsSuccessStatusCode)
+            {
+                var json = await httpResponse.Content.ReadAsStringAsync();
+                response = JsonConvert.DeserializeObject<GetRoutesResponse>(json)!;
+            }
             return View(response);
         }
 
+        [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
+
         [HttpPost]
         public async Task<IActionResult> Create(CreateRouteRequest request)
         {
@@ -37,12 +45,23 @@ namespace IPB2.OnlineBusSystem.MVC.HttpClientWebApi.Controllers
                     Origin = request.Origin,
                     Destination = request.Destination
                 };
-                var result = await _routeService.CreateAsync(upsertRequest);
-                if (result.Status == ResponseType.Success)
+
+                var requestJson = JsonConvert.SerializeObject(upsertRequest);
+                HttpContent content = new StringContent(requestJson, Encoding.UTF8, Application.Json);
+
+                HttpResponseMessage httpResponse = await _httpClient.PostAsync("api/routes", content);
+
+                if (httpResponse.IsSuccessStatusCode)
                 {
-                    return RedirectToAction(nameof(Index));
+                    var json = await httpResponse.Content.ReadAsStringAsync();
+                    ResponseBaseModel response = JsonConvert.DeserializeObject<ResponseBaseModel>(json)!;
+                    if (response.IsSuccess)
+                    {
+                        return RedirectToAction(nameof(Index));
+                    }
+
+                    ModelState.AddModelError("", response.Message ?? "Failed to create route.");
                 }
-                ModelState.AddModelError("", result.Message ?? "Failed to create route.");
             }
             return RedirectToAction(nameof(Index));
         }
@@ -52,12 +71,22 @@ namespace IPB2.OnlineBusSystem.MVC.HttpClientWebApi.Controllers
         {
             if (ModelState.IsValid)
             {
-                var result = await _routeService.UpsertAsync(request, id);
-                if (result.Status == ResponseType.Success)
+                var requestJson = JsonConvert.SerializeObject(request);
+                HttpContent content = new StringContent(requestJson, Encoding.UTF8, Application.Json);
+
+                HttpResponseMessage httpResponse = await _httpClient.PutAsync($"api/routes/{id}", content);
+
+                if (httpResponse.IsSuccessStatusCode)
                 {
-                    return RedirectToAction(nameof(Index));
+                    var json = await httpResponse.Content.ReadAsStringAsync();
+                    ResponseBaseModel response = JsonConvert.DeserializeObject<ResponseBaseModel>(json)!;
+                    if (response.IsSuccess)
+                    {
+                        return RedirectToAction(nameof(Index));
+                    }
+
+                    ModelState.AddModelError("", response.Message ?? "Failed to update route.");
                 }
-                ModelState.AddModelError("", result.Message ?? "Failed to update route.");
             }
             return RedirectToAction(nameof(Index));
         }
@@ -65,16 +94,23 @@ namespace IPB2.OnlineBusSystem.MVC.HttpClientWebApi.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(string id)
         {
-            var result = await _routeService.DeleteAsync(id);
-            if (result.Status == ResponseType.Success)
+
+            HttpResponseMessage httpResponse = await _httpClient.PutAsync($"api/routes/delete/{id}", null);
+
+            if (httpResponse.IsSuccessStatusCode)
             {
-                return RedirectToAction(nameof(Index));
+                var json = await httpResponse.Content.ReadAsStringAsync();
+                ResponseBaseModel response = JsonConvert.DeserializeObject<ResponseBaseModel>(json)!;
+                if (response.IsSuccess)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+
+                ModelState.AddModelError("", response.Message ?? "Failed to delete route.");
             }
-            ModelState.AddModelError("", result.Message ?? "Failed to delete route.");
+
+
             return RedirectToAction(nameof(Index));
         }
-
-
-
     }
 }

@@ -66,6 +66,20 @@ public class RoutesController : ControllerBase
         var response = await _routeService.DeleteAsync(id);
         return ResponseHelper.ConvertResponseType(response);
     }
+    [HttpPut("delete/{id}")]
+    public async Task<IActionResult> DeleteRouteById(string id)
+    {
+        var response = await _routeService.DeleteAsync(id);
+        return ResponseHelper.ConvertResponseType(response);
+    }
+
+    [HttpGet("comboset")]
+    public async Task<IActionResult> GetRouteComboSet()
+    {
+        var response = await _routeService.GetRouteComboSet();
+        if (response == null) return NotFound(new ResponseBaseModel { IsSuccess = false, Message = "Bus not found." });
+        return Ok(response);
+    }
     private ResponseBaseModel Validation(UpsertRouteRequest request)
     {
         // Require Validation

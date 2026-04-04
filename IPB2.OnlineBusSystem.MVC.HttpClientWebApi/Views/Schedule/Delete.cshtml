@@ -1,15 +1,15 @@
-﻿<!-- Delete Route Modal -->
-<div class="modal fade" id="deleteRouteModal" tabindex="-1" aria-labelledby="deleteRouteModalLabel" aria-hidden="true">
+<!-- Delete Schedule Modal -->
+<div class="modal fade" id="deleteScheduleModal" tabindex="-1" aria-labelledby="deleteScheduleModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title" id="deleteRouteModalLabel"><i class="fas fa-exclamation-triangle me-2"></i>Delete Confirmation</h5>
+                <h5 class="modal-title" id="deleteScheduleModalLabel"><i class="fas fa-exclamation-triangle me-2"></i>Delete Confirmation</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form asp-action="Delete" asp-controller="Route" method="post">
-                <input type="hidden" name="id" id="deleteRouteId" />
+            <form asp-action="Delete" asp-controller="Schedule" method="post">
+                <input type="hidden" name="id" id="deleteScheduleId" />
                 <div class="modal-body px-4 py-4">
-                    <p class="mb-0">Are you sure you want to delete the route for <span id="deleteRouteDisplay" class="fw-bold"></span>?</p>
+                    <p class="mb-0">Are you sure you want to delete the schedule for <span id="deleteScheduleInfoDisplay" class="fw-bold"></span>?</p>
                     <p class="text-muted small mt-2">This action cannot be undone.</p>
                 </div>
                 <div class="modal-footer bg-light border-0 px-4 py-3">

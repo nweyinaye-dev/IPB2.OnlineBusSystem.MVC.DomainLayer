@@ -8,7 +8,7 @@ namespace IPB2.OnlineScheduleSystem.WebApi.Features.Admin.Schedule
     [ApiController]
     public class SchedulesController : ControllerBase
     {
-       IScheduleService _scheduleService ;
+        IScheduleService _scheduleService;
         public SchedulesController(IScheduleService scheduleService)
         {
             _scheduleService = scheduleService;
@@ -20,7 +20,12 @@ namespace IPB2.OnlineScheduleSystem.WebApi.Features.Admin.Schedule
             var response = await _scheduleService.GetScheduleAsync(pageNo, pageSize);
             return Ok(response);
         }
-
+        [HttpGet("searchByDate")]
+        public async Task<IActionResult> GetSchedules(string searchDate)
+        {
+            var response = await _scheduleService.GetScheduleAsync(searchDate);
+            return Ok(response);
+        }
         [HttpGet("{id}")]
         public async Task<IActionResult> GetSchedule(string id)
         {
@@ -61,6 +66,12 @@ namespace IPB2.OnlineScheduleSystem.WebApi.Features.Admin.Schedule
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteSchedule(string id)
+        {
+            var response = await _scheduleService.DeleteAsync(id);
+            return ResponseHelper.ConvertResponseType(response);
+        }
+        [HttpPut("delete/{id}")]
+        public async Task<IActionResult> DeleteScheduleById(string id)
         {
             var response = await _scheduleService.DeleteAsync(id);
             return ResponseHelper.ConvertResponseType(response);

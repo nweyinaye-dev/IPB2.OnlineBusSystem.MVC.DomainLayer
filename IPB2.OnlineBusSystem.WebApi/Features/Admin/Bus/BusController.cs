@@ -73,6 +73,20 @@ namespace IPB2.OnlineBusSystem.WebApi.Features.Admin.Bus
             var response = await _busService.DeleteAsync(id);
             return ResponseHelper.ConvertResponseType(response);
         }
+
+        [HttpPut("delete/{id}")]
+        public async Task<IActionResult> DeleteBusById(string id)
+        {
+            var response = await _busService.DeleteAsync(id);
+            return ResponseHelper.ConvertResponseType(response);
+        }
+        [HttpGet("comboset")]
+        public async Task<IActionResult> GetBusComboSet()
+        {
+            var response = await _busService.GetBusComboSet();
+            if (response == null) return NotFound(new ResponseBaseModel { IsSuccess = false, Message = "Bus not found." });
+            return Ok(response);
+        }
         private ResponseBaseModel Validation(UpsertBusRequest request)
         {
             // Require Validation

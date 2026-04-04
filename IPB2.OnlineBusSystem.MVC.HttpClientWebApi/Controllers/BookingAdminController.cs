@@ -1,4 +1,4 @@
-﻿using IPB2.OnlineBusSystem.Domain.Features.Booking;
+using IPB2.OnlineBusSystem.Domain.Features.Booking;
 using Microsoft.AspNetCore.Mvc;
 
 namespace IPB2.OnlineBusSystem.MVC.HttpClientWebApi.Controllers
