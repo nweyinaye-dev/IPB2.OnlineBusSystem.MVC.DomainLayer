@@ -84,7 +84,12 @@
                                     <td><span class="badge bg-info text-dark">@item.SeatNo</span></td>
                                     <td class="fw-bold text-primary">@item.BookedFare.ToString("N0") <small>Ks</small></td>
                                     <td>
-                                        <button class="btn btn-danger btn-sm cancel-booking" data-id="@item.Id">
+                                       @*  <button class="btn btn-danger btn-sm cancel-booking" data-id="@item.Id">
+                                            <i class="fa-solid fa-trash"></i> Cancel
+                                        </button> *@
+                                        <button type="button" class="btn btn-danger btn-sm cancel-booking" title="Cancel" data-id="@item.Id"
+                                                data-bs-toggle="modal" data-bs-target="#cancelBookingmodal"
+                                                >
                                             <i class="fa-solid fa-trash"></i> Cancel
                                         </button>
                                     </td>
@@ -103,44 +108,56 @@
         </div>
     </div>
 </div>
-
+<partial name="Cancel" />
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-        $(document).ready(function () {
-            $('.cancel-booking').on('click', function () {
-                var bookingId = $(this).data('id');
-                var row = $(this).closest('tr');
 
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: "You won't be able to revert this!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#3085d6',
-                    confirmButtonText: 'Yes, cancel it!'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        $.post('/Booking/Cancel', { id: bookingId }, function (response) {
-                            if (response.success) {
-                                Swal.fire(
-                                    'Cancelled!',
-                                    response.message,
-                                    'success'
-                                );
-                                row.fadeOut(500, function() { $(this).remove(); });
-                            } else {
-                                Swal.fire(
-                                    'Error!',
-                                    response.message,
-                                    'error'
-                                );
-                            }
-                        });
-                    }
-                });
-            });
+        // Edit Modal Data Sync
+        const cancelBookingmodal = document.getElementById('cancelBookingmodal');
+        if (cancelBookingmodal) {
+        cancelBookingmodal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const id = button.getAttribute('data-id');
+       
+        cancelBookingmodal.querySelector('#cancelBookingId').value = id;
         });
+        }
+
+        // $(document).ready(function () {
+        //     $('.cancel-booking').on('click', function () {
+        //         var bookingId = $(this).data('id');
+        //         var row = $(this).closest('tr');
+
+        //         Swal.fire({
+        //             title: 'Are you sure?',
+        //             text: "You won't be able to revert this!",
+        //             icon: 'warning',
+        //             showCancelButton: true,
+        //             confirmButtonColor: '#d33',
+        //             cancelButtonColor: '#3085d6',
+        //             confirmButtonText: 'Yes, cancel it!'
+        //         }).then((result) => {
+        //             if (result.isConfirmed) {
+        //                 $.post('/Booking/Cancel', { id: bookingId }, function (response) {
+        //                     if (response.success) {
+        //                         Swal.fire(
+        //                             'Cancelled!',
+        //                             response.message,
+        //                             'success'
+        //                         );
+        //                         row.fadeOut(500, function() { $(this).remove(); });
+        //                     } else {
+        //                         Swal.fire(
+        //                             'Error!',
+        //                             response.message,
+        //                             'error'
+        //                         );
+        //                     }
+        //                 });
+        //             }
+        //         });
+        //     });
+        // });
     </script>
 }

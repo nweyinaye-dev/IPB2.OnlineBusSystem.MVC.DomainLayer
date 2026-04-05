@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace IPB2.OnlineBusSystem.WebApi.Features.Report
 {
-    [Route("api/booking")]
+    [Route("api/BookingReport")]
     [ApiController]
     public class BookingReportController : ControllerBase
     {

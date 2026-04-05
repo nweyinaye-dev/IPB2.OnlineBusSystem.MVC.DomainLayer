@@ -1,6 +1,11 @@
 ﻿@{
     var controller = ViewContext.RouteData.Values["Controller"]?.ToString();
-    var isAdmin = controller == "Bus" || controller == "Route" || controller == "Schedule" || controller == "BookingAdmin";
+    var action = ViewContext.RouteData.Values["Action"]?.ToString();
+    var isAdmin = controller == "Bus" || controller == "Route" || controller == "Schedule" 
+    || (controller == "Booking" && action == "BookingAllList");
+}
+
+
 }
 
 <!DOCTYPE html>
@@ -41,7 +46,7 @@
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Schedule" asp-action="Index">Schedules</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="BookingAdmin" asp-action="BookingAllList">Booking List</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Booking" asp-action="BookingAllList">Booking List</a>
                             </li>
                         </ul>
                     }

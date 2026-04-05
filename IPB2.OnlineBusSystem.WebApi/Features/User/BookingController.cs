@@ -1,10 +1,11 @@
 using IPB2.OnlineBusSystem.Domain.Common;
 using IPB2.OnlineBusSystem.Domain.Features.Booking;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
-namespace IPB2.OnlineBusSystem.WebApi.Features.User
+namespace IPB2.OnlineBusSystem.WebApi.Features.User.Booking
 {
-    [Route("api/[controller]")]
+    [Route("api/booking")]
     [ApiController]
     public class BookingController : ControllerBase
     {
@@ -15,7 +16,7 @@ namespace IPB2.OnlineBusSystem.WebApi.Features.User
             _bookService = bookService;
         }
 
-        [HttpPost("/search")]
+        [HttpPost("search")]
         public async Task<IActionResult> SearchBus(SearchBusRequest request)
         {
 
@@ -30,7 +31,7 @@ namespace IPB2.OnlineBusSystem.WebApi.Features.User
             return Ok(response);
         }
 
-        [HttpPost("/book")]
+        [HttpPost("book")]
         public async Task<IActionResult> CreateBooking(BookRequest request)
         {
             if (string.IsNullOrWhiteSpace(request.ScheduleId))
@@ -47,7 +48,7 @@ namespace IPB2.OnlineBusSystem.WebApi.Features.User
             return ResponseHelper.ConvertResponseType(response);
         }
 
-        [HttpPost("/cancel")]
+        [HttpPut("cancel/{id}")]
         public async Task<IActionResult> Cancel(string id)
         {
             var result = await _bookService.CancelAsync(id);
@@ -57,7 +58,23 @@ namespace IPB2.OnlineBusSystem.WebApi.Features.User
             }
             return Ok(new ResponseBaseModel { IsSuccess = false, Message = result.Message });
         }
+        [HttpGet("getAllBookinglist")]
+        public async Task<IActionResult> BookingAllList(string? txtBkSearch)
+        {
+            BookingDetailResponse response = new();
+            response = await _bookService.GetBookingDetailAsync(txtBkSearch);            
+            return Ok(response);
+        }
 
-       
+        [HttpGet("getBookinglist")]
+        public async Task<IActionResult> BookingListByUser(string? username, string? phoneno)
+        {
+            BookingDetailResponse response = new();
+            if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(phoneno))
+            {
+                response = await _bookService.GetBookingDetailByUserAsync(username, phoneno);
+            }
+            return Ok(response);
+        }
     }
 }
